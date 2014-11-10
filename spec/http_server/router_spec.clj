@@ -16,6 +16,7 @@
   (spit "/tmp/test" text))
 
 (describe "Router"
+
   (after (write-to-test ""))
 
   (it "returns file contnets from a GET /file request"
@@ -56,9 +57,42 @@
                (router path {:action "DELETE" :location "/test"} {})))
     (should= "" (slurp (str path "/test"))))
 
+  (it "returns 405 when attempting to post to protected file"
+    (with-redefs [http-server.router/config-options {:protected '("/test")}]
+      (should-contain "HTTP/1.1 405"
+                      (String. 
+                        (router path 
+                                {:action "PUT" :location "/test"}
+                                {} "Hello")))))
+  
+  (it "should contain query params in the body of the response"
+    (with-redefs [http-server.router/special-routes '("/parameters")
+                  http-server.router/config-options {:accept-parameters 
+                                                     '("/parameters")}] 
+      (should-contain 
+        "variable_1 = Operators <, >, =, !=; +, -, *, &, @, #, $, [, ]:"
+                      (String. 
+                        (router path 
+                                {:action "GET" :location query-params} 
+                                {})))))
+
+ (it "should contain HTML directory in body on GET /"
+   (with-redefs [http-server.router/config-options {:directory '("/")}
+                 http-server.router/special-routes '("/")]
+  (should-contain 
+     "HTTP/1.1 200 OK\r\nContent-Length: 174\r\n\r\n<!DOCTYPE html><html><head><title>directory</title></head><body><a href=\"/index.html\">index.html</a><br><a href=\"/logs\">logs</a><br><a href=\"/test\">test</a><br></body></html>"  
+             (String. (router path {:action "GET" :location "/"} {}))))) 
+
+ (it "returns 301 for redirect request"
+   (with-redefs [http-server.router/config-options {:redirect '("/redirect")}
+                 http-server.router/special-routes '("/redirect")]
+     (should-contain "HTTP/1.1 301"
+                     (String. (router path {:action "GET"
+                                           :location "/redirect"} {})))))
+
   (it "returns 200 ok for HEAD request"
     (should= ok (String. (router path {:action "HEAD" :location "/"} {}))))
 
-  (it "returns 500 for bad reuest"
+  (it "returns 500 for bad request"
     (should-contain "HTTP/1.1 500"
                     (String. (router path {:action "BAD" :location "/"} {})))))
