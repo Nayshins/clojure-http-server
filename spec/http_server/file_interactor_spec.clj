@@ -2,8 +2,7 @@
   (:require [http_server.file-interactor :refer :all]
             [speclj.core :refer :all]))
 
-(def test-path (str (-> (java.io.File. "") .getAbsolutePath) 
-                    "/test/file.txt"))
+(def test-path "/tmp/test")
 
 (describe "file interactor"
   (after (spit test-path ""))
