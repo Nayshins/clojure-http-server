@@ -80,7 +80,7 @@
    (with-redefs [http-server.router/config-options {:directory '("/")}
                  http-server.router/special-routes '("/")]
   (should-contain 
-     "HTTP/1.1 200 OK\r\nContent-Length: 174\r\n\r\n<!DOCTYPE html><html><head><title>directory</title></head><body><a href=\"/index.html\">index.html</a><br><a href=\"/logs\">logs</a><br><a href=\"/test\">test</a><br></body></html>"  
+     "<!DOCTYPE html><html><head><title>directory</title></head>"  
              (String. (router path {:action "GET" :location "/"} {}))))) 
 
  (it "returns 301 for redirect request"
