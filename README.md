@@ -30,8 +30,7 @@ Once you have your server configured to your needs, you can start the server. Th
 -p --port Port number you want the server to listen on
 -d --directory Location of the public directory you would like to server
 ```
-An example to run the server on port 5000 and server a public directory looks like
-
+An example command to run the server on port 5000 with the public directory looks like
 ```
-$ lein run -p 5000 -d /public
+$ lein run -p 5000 -d ./public
 ```
