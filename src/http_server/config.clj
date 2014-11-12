@@ -35,6 +35,5 @@
         {}
         config-opts)))
   (catch Exception e 
-    (prn e)
     {}))) 
 
