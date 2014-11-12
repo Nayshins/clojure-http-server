@@ -17,12 +17,11 @@
 
 (defn build-headers [headers]
   (if (not-empty headers)
-    (->> headers
-         (map #(str (key %) ": " (val %) "\r\n"))
-         (apply str)
-         ^String
-         (.getBytes)
-         (byte-array))))
+    (as-> headers __
+         (map #(str (key %) ": " (val %) "\r\n") __)
+         (apply str __)
+         (.getBytes ^String __)
+         (byte-array __))))
 
 (defn build-body [body]
   (if-not (nil? (first body))
