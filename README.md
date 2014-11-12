@@ -6,8 +6,10 @@ Leiningen 2.5 is required in order to run the server. Installation instructions 
 ## Initial Setup
 1. Clone repository into directory of your chosing
 2. cd into the clojure-http-server directory
-3. run $lein deps to install dependencies
-
+3. To install dependencies, run:
+```
+$ lein deps 
+```
 ## Configure Server
 The server can handle special routes by editing the config file. The accepted headings are :authenticate and :credentials, :accept-parameters, :protected, :redirect, :directory. 
 
