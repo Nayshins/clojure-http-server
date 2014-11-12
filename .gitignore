@@ -11,4 +11,3 @@ m.xml
 .lein-plugins
 .lein-repl-history
 .nrepl-port
-/public/logs
