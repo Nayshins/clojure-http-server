@@ -1,5 +1,5 @@
 # Simple Http Server Written in Clojure
-
+[![Build Status](https://travis-ci.org/Nayshins/clojure-http-server.svg?branch=master)](https://travis-ci.org/Nayshins/clojure-http-server)
 ## Requirments 
 Leiningen 2.5 is required in order to run the server. Installation instructions can be found [here](http://leiningen.org/)
 
