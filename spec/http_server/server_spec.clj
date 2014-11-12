@@ -31,13 +31,13 @@
 (describe "server"
   (it "accepts a connection"
     (with-open [ss (create-server-socket 5000)]
-      (future (server ss "../http-server/public"))
+      (future (server ss "../clojure-http-server/public"))
         (connect)
      (should (> @connection-count 0))))
 
   (it "accepts many connections"
       (with-open [ss (create-server-socket 5000)]
-        (future (server ss "../http-server/public"))
+        (future (server ss "../clojure-http-server/public"))
         (multiple-connect 10))
       (should (> @connection-count 8))))
 
@@ -66,7 +66,7 @@
   (it "returns 200 OK on GET / request"
       (with-open [ss (create-server-socket 4000)]
         (future (server ss 
-                  "../http-server/public"))
+                  "../clojure-http-server/public"))
         (should= "HTTP/1.1 200 OK" (test-input-output 
                                      "GET / HTTP/1.1\r\nContent-Length: 0\r\n\r\n")))))
 

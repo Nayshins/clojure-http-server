@@ -20,6 +20,7 @@
     (->> headers
          (map #(str (key %) ": " (val %) "\r\n"))
          (apply str)
+         ^String
          (.getBytes)
          (byte-array))))
 
