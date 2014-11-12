@@ -46,8 +46,6 @@
                     {"Content-Length" (count directory-links)} 
                     directory-links)))
 
-
-
 (defn check-auth [auth]
   (if auth
     (= (config-options :credentials) (base64/decode (second auth))) 
