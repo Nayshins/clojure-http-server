@@ -21,4 +21,4 @@
 (defn -main [& args]
   (let [{:keys [options arguments summary]} (parse-opts args cli-options)]
     (reset! directory (options :directory))
-    (server/server (create-server-socket (options :port)) (options :directory))))
+    (server/server (server/create-server-socket (options :port)) (options :directory))))
