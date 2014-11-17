@@ -33,14 +33,7 @@
       (.await server-latch)
       (connect)
       (.await socket-latch)
-      (should (> @connection-count 0))))
-
-  (it "accepts many connections"
-      (with-open [ss (create-server-socket 5000)]
-        (future (server ss "./public"))
-        (.await server-latch)
-        (multiple-connect 10))
-      (should (> @connection-count 8))))
+      (should (> @connection-count 0)))))
 
 (describe "request reader"
   (it "reads all of the request headers"

@@ -24,7 +24,7 @@
 
 (defn create-server-socket [port]
   (let [ss (ServerSocket. port)]
-    (.countDown server-latch)
+    (.countDown ^java.util.concurrent.CountDownLatch server-latch)
     ss))
 
 (defn socket-reader [socket]
@@ -80,6 +80,8 @@
     (let [connection (accept-connection server-socket)]
       (future
         (with-open [socket ^Socket connection]
+          (swap! connection-count inc)
+          (.countDown ^java.util.concurrent.CountDownLatch socket-latch)
           (socket-handler connection directory))))
     (if (.isClosed server-socket)
       (reset! connection-count 0N)
