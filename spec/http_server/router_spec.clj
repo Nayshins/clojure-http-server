@@ -93,6 +93,6 @@
   (it "returns 200 ok for HEAD request"
     (should= ok (String. (router path {:action "HEAD" :location "/"} {}))))
 
-  (it "returns 500 for bad request"
-    (should-contain "HTTP/1.1 500"
+  (it "returns 400 for bad request"
+    (should-contain "HTTP/1.1 400"
                     (String. (router path {:action "BAD" :location "/"} {})))))

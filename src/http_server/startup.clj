@@ -1,7 +1,6 @@
 (ns http-server.startup
   (:require [clojure.tools.cli :refer [parse-opts]]
-            [http-server.server :refer :all]
-            [http-server.config :refer :all])
+            [http-server.server :as server])
   (:import [java.io File])
   (:gen-class))
 
@@ -22,4 +21,4 @@
 (defn -main [& args]
   (let [{:keys [options arguments summary]} (parse-opts args cli-options)]
     (reset! directory (options :directory))
-    (server (create-server-socket (options :port)) (options :directory))))
+    (server/server (create-server-socket (options :port)) (options :directory))))

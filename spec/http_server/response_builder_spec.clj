@@ -4,7 +4,7 @@
 
 (describe "Build Code"
   (it "returns a http response code line"
-    (should= "HTTP/1.1 200 OK\r\n" (String. (build-code :200)))))
+    (should= "HTTP/1.1 200 OK\r\n" (String. (build-code 200)))))
 
 (describe "build headers"
   (it "converts headers from hashmap to byte-array"
@@ -21,5 +21,5 @@
 (describe "build-response"
   (it "builds the full response"
     (should= "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n"
-             (String. (build-response :200 
+             (String. (build-response 200 
                                       {"Content-Length" 0})))))
