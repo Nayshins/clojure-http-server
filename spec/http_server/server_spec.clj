@@ -7,8 +7,7 @@
 
 
 (defn connect []
-   (with-open [socket (Socket. "localhost"  5000)]
-              (Thread/sleep 100)))
+   (with-open [socket (Socket. "localhost"  5000)]))
 
 (defn multiple-connect [connections]
   (dotimes [n connections]
@@ -20,7 +19,6 @@
               in (reader socket)]
     (.write out request)
     (.flush out)
-    (Thread/sleep 100)
     (.readLine in)))
 
 (describe "create-server"
@@ -32,12 +30,14 @@
   (it "accepts a connection"
     (with-open [ss (create-server-socket 5000)]
       (future (server ss "./public"))
+        (.await server-latch)
         (connect)
      (should (> @connection-count 0))))
 
   (it "accepts many connections"
       (with-open [ss (create-server-socket 5000)]
         (future (server ss "./public"))
+        (.await server-latch)
         (multiple-connect 10))
       (should (> @connection-count 8))))
 
@@ -67,6 +67,7 @@
       (with-open [ss (create-server-socket 4000)]
         (future (server ss 
                   "./public"))
+        (.await server-latch)
         (should= "HTTP/1.1 200 OK" (test-input-output 
                                      "GET / HTTP/1.1\r\nContent-Length: 0\r\n\r\n")))))
 
