@@ -2,15 +2,18 @@
   (:import [java.io BufferedReader DataOutputStream
             InputStreamReader BufferedOutputStream]
            [java.net ServerSocket Socket SocketException]
-           [java.lang Integer])
+           [java.lang Integer]
+           [java.util.concurrent.CountDownLatch])
   (:require [clojure.java.io :as io]
-            [http-server.request-parser :refer :all]
-            [http-server.router :refer :all]
+            [http-server.request-parser :as request-parser]
+            [http-server.router :as router]
             [clojure.tools.logging :as log]))
 
 (set! *warn-on-reflection* true)
 
 (def connection-count (atom 0N))
+
+(def server-latch (java.util.concurrent.CountDownLatch. 1))
 
 (defn accept-connection [^ServerSocket server]
   (try
@@ -18,7 +21,9 @@
     (catch SocketException e)))
 
 (defn create-server-socket [port]
-  (ServerSocket. port))
+  (let [ss (ServerSocket. port)]
+    (.countDown server-latch)
+    ss))
 
 (defn socket-reader [socket]
   (let [reader (BufferedReader. (InputStreamReader. (.getInputStream ^Socket socket)))]
@@ -44,8 +49,8 @@
 (defn read-request [in]
   (let [request (read-headers in) 
         request-line (first request)
-        headers (convert-headers-to-hashmap (rest request))
-        content-length (get-content-length headers)
+        headers (request-parser/convert-headers-to-hashmap (rest request))
+        content-length (request-parser/get-content-length headers)
         request {:request-line request-line  :headers headers}]
     (log/info request-line)
     (if (> content-length 0)
@@ -62,8 +67,8 @@
     (let [in (socket-reader socket)
           out (socket-writer socket)
           rri (read-request in)
-          parsed-request (parse-request-line (rri :request-line))]
-      (let [response (router 
+          parsed-request (request-parser/parse-request-line (rri :request-line))]
+      (let [response (router/router 
                        directory parsed-request 
                        (rri :headers)(rri :body))]
         (write-response out response))))
