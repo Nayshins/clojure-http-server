@@ -171,15 +171,43 @@
 (defn head-route [location directory]
   (response-builder/build-response 200 {}))
 
-(defn router [directory parsed-request headers & body]
+(defmulti router (fn [directory parsed-request headers & body]
+                   (parsed-request :action)))
+
+(defmethod router "GET" [directory parsed-request headers & body]
   (let [action (parsed-request :action)
         location (parsed-request :location)]
-    (case action
-      "GET" (get-route location directory headers)
-      "OPTIONS" (options-route location directory)
-      "POST" (post-route (first body) location directory)
-      "PATCH" (patch-route (first body) location directory headers)
-      "PUT" (put-route  (first body) location directory)
-      "DELETE" (delete-route location directory)
-      "HEAD" (head-route location directory)
-      (response-builder/build-response 400 {}))))
+    (get-route location directory headers)))
+
+(defmethod router "OPTIONS" [directory parsed-request headers & body]
+  (let [action (parsed-request :action)
+        location (parsed-request :location)]
+    (options-route location directory)))
+
+(defmethod router "POST" [directory parsed-request headers & body]
+  (let [action (parsed-request :action)
+        location (parsed-request :location)]
+    (post-route (first body) location directory)))
+
+(defmethod router "PATCH" [directory parsed-request headers & body]
+  (let [action (parsed-request :action)
+        location (parsed-request :location)]
+    (patch-route (first body) location directory headers)))
+
+(defmethod router "PUT" [directory parsed-request headers & body]
+  (let [action (parsed-request :action)
+        location (parsed-request :location)]
+    (put-route (first body) location directory)))
+
+(defmethod router "DELETE" [directory parsed-request headers & body]
+  (let [action (parsed-request :action)
+        location (parsed-request :location)]
+    (delete-route location directory)))
+
+(defmethod router "HEAD" [directory parsed-request headers & body]
+  (let [action (parsed-request :action)
+        location (parsed-request :location)]
+    (head-route location directory)))
+
+(defmethod router :default [directory parsed-request headers & body]
+  (response-builder/build-response 400 {}))
