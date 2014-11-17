@@ -30,9 +30,10 @@
   (it "accepts a connection"
     (with-open [ss (create-server-socket 5000)]
       (future (server ss "./public"))
-        (.await server-latch)
-        (connect)
-     (should (> @connection-count 0))))
+      (.await server-latch)
+      (connect)
+      (.await socket-latch)
+      (should (> @connection-count 0))))
 
   (it "accepts many connections"
       (with-open [ss (create-server-socket 5000)]
