@@ -7,8 +7,6 @@
             [pantomime.mime :refer [mime-type-of]]
             [pandect.core :as pandect]))
 
-(set! *warn-on-reflection* true)
-
 (def config-options (read-config-file
                          (str 
                            (-> 

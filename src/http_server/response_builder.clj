@@ -1,7 +1,6 @@
 (ns http_server.response-builder
   (:require [clojure.java.io :as io]))
 
-(set! *warn-on-reflection* true)
 (def response-code { 200 " OK\r\n"
                      204 " NO CONTENT\r\n"
                      206 " PARTIAL CONTENT\r\n"

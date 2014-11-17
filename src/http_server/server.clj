@@ -59,7 +59,6 @@
       (assoc request :body (read-body in content-length))
       request)))
 
-
 (defn write-response [^DataOutputStream out response]
   (with-open [out out] 
     (.write out response 0 (count response))
@@ -86,6 +85,3 @@
     (if (.isClosed server-socket)
       (reset! connection-count 0N)
       (recur))))
-
-
-
