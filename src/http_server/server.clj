@@ -80,8 +80,6 @@
     (let [connection (accept-connection server-socket)]
       (future
         (with-open [socket ^Socket connection]
-          (swap! connection-count inc)
-          (.countDown socket-latch)
           (socket-handler connection directory))))
     (if (.isClosed server-socket)
       (reset! connection-count 0N)

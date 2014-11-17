@@ -41,21 +41,21 @@
   (it "appends body of the request to the requested file POST"
     (write-to-test "test")
     (should= ok 
-             (String. (router path {:action "POST" :location "/test"} {} "test")))
-    (should= "test" (slurp (str path "/test"))))
+             (String. (router "/" {:action "POST" :location "/tmp/test"} {} "test")))
+    (should= "testtest" (slurp "/tmp/test")))
 
   (it "PUT overwrites current file content"
     (write-to-test "FAIL")
     (should= ok 
-             (String. (router path {:action "PUT" :location "/test"} {} "PUT test")))
-    (should= "PUT test" (slurp (str path "/test"))))
+             (String. (router "/" {:action "PUT" :location "/tmp/test"} {} "PUT test")))
+    (should= "PUT test" (slurp "/tmp/test")))
 
   (it "deletes file contents with DELETE"
     (write-to-test "FAIL")
     (should= ok 
              (String. 
-               (router path {:action "DELETE" :location "/test"} {})))
-    (should= "" (slurp (str path "/test"))))
+               (router "/" {:action "DELETE" :location "/tmp/test"} {})))
+    (should= "" (slurp "/tmp/test")))
 
   (it "returns 405 when attempting to post to protected file"
     (with-redefs [http-server.router/config-options {:protected '("/test")}]
