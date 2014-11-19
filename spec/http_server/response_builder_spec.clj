@@ -21,5 +21,5 @@
 (describe "build-response"
   (it "builds the full response"
     (should= "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n"
-             (String. (build-response 200 
-                                      {"Content-Length" 0})))))
+             (String. (build-response {:status 200
+                                       :headers {"Content-Length" "0"}})))))

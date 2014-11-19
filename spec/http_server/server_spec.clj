@@ -57,11 +57,11 @@
       (should= "body" ((read-request reader) :body)))))
 
 (describe "socket handler"
-  (it "returns 200 OK on GET / request"
+  (it "returns 200 OK on GET /index.html request"
       (with-open [ss (create-server-socket 4000)]
         (future (server ss 
                   "./public"))
         (.await server-latch)
         (should= "HTTP/1.1 200 OK" (test-input-output 
-                                     "GET / HTTP/1.1\r\nContent-Length: 0\r\n\r\n")))))
+                                     "GET /index.html HTTP/1.1\r\nContent-Length: 0\r\n\r\n")))))
 

@@ -27,7 +27,10 @@
   (if-not (nil? (first body))
   (first body)))
 
-(defn build-response [code headers & body]
+(defn build-response [status-map]
   (let [response-byte-arrays
-        [(build-code code) (build-headers headers) (.getBytes "\r\n") (build-body body)]]
+        [(build-code (status-map :status))
+         (build-headers (status-map :headers)) 
+         (.getBytes "\r\n") 
+         (build-body (status-map :body))]]
     (byte-array (mapcat seq response-byte-arrays))))

@@ -1,22 +1,10 @@
 (ns http-server.router
   (:require [http_server.response-builder :as response-builder]
             [http_server.fileio :as fileio]
-            [http-server.config :refer :all]
             [clojure.java.io :as io]
             [base64-clj.core :as base64]
             [pantomime.mime :refer [mime-type-of]]
             [pandect.core :as pandect]))
-
-(def config-options (read-config-file
-                         (str 
-                           (-> 
-                             (java.io.File. "")
-                             .getAbsolutePath) "/config")))
-
-(def special-routes (concat (config-options :directory) 
-                          (config-options :accept-parameters)
-                          (config-options :redirect)
-                          (config-options :authenticate)))
 
 (defn to-byte-array [string]
   (->> ^String string
@@ -44,10 +32,10 @@
                     {"Content-Length" (count directory-links)} 
                     directory-links)))
 
-(defn check-auth [auth]
-  (if auth
-    (= (config-options :credentials) (base64/decode (second auth))) 
-    false))
+;(defn check-auth [auth]
+  ;(if auth
+    ;(= (config-opti) (base64/decode (second auth))) 
+    ;false))
 
 (defn get-trimmed-body [body-bytes begin end]
   (->> body-bytes
@@ -65,11 +53,11 @@
         begin (Integer. ^String (first byte-range))
         end (+ 1 (Integer. ^String (second byte-range)))
         body (get-trimmed-body body-bytes begin end)]
-    (response-builder/build-response 206 {"Content-Type"
-                          (mime-type-of (io/file path))
-                          "Content-Length"
-                          (count body)}
-                    body)))
+    {:status 206 
+     :headers {"Content-Type" (mime-type-of (io/file path))
+               "Content-Length"
+               (count body)}
+     :body body}))
 
 (defn get-file-data [directory location headers]
   (try
@@ -77,14 +65,12 @@
           body-data (fileio/binary-slurp path)]
       (if (contains? headers :Range)
         (get-body-range body-data (headers :Range) path)
-        (response-builder/build-response 200
-                        {"Content-Type" 
-                         (mime-type-of (io/file path))
-                         "Content-Length" 
-                         (count body-data) } 
-                        body-data)))
+        {:status 200 
+         :headers {"Content-Type" (mime-type-of (io/file path))
+                   "Content-Length" (count body-data) } 
+         :body body-data}))
     (catch Exception e
-      (response-builder/build-response 404 {}))))
+      {:status 404})))
 
 (defn authenticate [directory location headers]
   (let [no-auth (.getBytes "Authentication required")]
@@ -101,73 +87,52 @@
 
 (defn handle-query [params]
   (let [decoded-params (decode-params params)]
-    (response-builder/build-response 200 
-                    {:Content-Length (count decoded-params)} 
-                    decoded-params)))
+    {:status 200 
+     :headers {:Content-Length (count decoded-params)} 
+     :body decoded-params}))
 
 (defn contain-route? [config-option location]
   (some (partial = location) config-option))
-
-(defn handle-special-route [location directory headers params]
-  (cond
-    (contain-route? (config-options :directory) location) 
-      (build-directory directory)
-    (contain-route? (config-options :authenticate) location) 
-      (authenticate directory location headers)
-    (contain-route? (config-options :accept-parameters) location)
-      (handle-query params)
-    (contain-route? (config-options :redirect) location) 
-      (response-builder/build-response 301 {"Location" "http://localhost:5000/"})
-    :else (response-builder/build-response 500 {})))
 
 (defn get-route [location directory headers] 
   (let [query (clojure.string/split location #"\?") 
         location (first query)
         params (second query)]
-    (cond 
-      (some (partial = location) special-routes)
-        (handle-special-route location directory headers params)
-      (= "/" location)
-        (get-file-data directory "/index.html" headers)
-      :else (get-file-data directory location headers))))
+    (get-file-data directory location headers)))
 
 (defn options-route [location directory]
-  (response-builder/build-response 200 {"Allow" "GET,HEAD,POST,OPTIONS,PUT"}))
-
-(defn not-valid-file [location]
-  (some (partial = location) (config-options :protected)))
+{:status 200 :headers {"Allow" "GET,HEAD,POST,OPTIONS,PUT"}})
 
 (defn patch-route [body location directory headers]
-  (cond 
-    (not-valid-file location) (response-builder/build-response 405 {})
-    :else
     (let [path (str directory location)
           file-data (slurp path)
           encoded-file-data (pandect/sha1 file-data)
           etag (headers :If-Match)]
       (fileio/overwrite-file path body)
-      (response-builder/build-response 204 {}))))
+      {:status 204}))
 
 (defn post-route [body location directory]
-  (cond
-    (not-valid-file location) (response-builder/build-response 405 {})
-    :else (do 
-            (fileio/append-to-file (str directory location) body)
-            (response-builder/build-response 200 {}))))
+  (do 
+    (fileio/append-to-file (str directory location) body)
+    {:status 200}))
 
 (defn put-route [body location directory]
-  (cond
-    (not-valid-file location) (response-builder/build-response 405 {})
-    :else (do 
-            (spit (str directory location) body)
-            (response-builder/build-response 200 {}))))
+  (do 
+    (spit (str directory location) body)
+    {:status 200}))
 
 (defn delete-route [location directory]
   (spit (str directory location) "")
-  (response-builder/build-response 200 {}))
+  {:status 200})
 
 (defn head-route [location directory]
-  (response-builder/build-response 200 {}))
+  {:status 200})
+
+(defn functional-router [directory parsed-request
+                         headers custom-routes & body]
+  (let [route-key (str (parsed-request :action) " " (parsed-request :location))]
+   (if (contains? custom-routes route-key)
+     (eval (custom-routes route-key)))))
 
 (defmulti router (fn [directory parsed-request headers & body]
                    (parsed-request :action)))
@@ -208,4 +173,9 @@
     (head-route location directory)))
 
 (defmethod router :default [directory parsed-request headers & body]
-  (response-builder/build-response 400 {}))
+  {:status 400})
+
+(defn route [directory request custom-routes]
+  (let [status (router directory (request :parsed-request) 
+          (request :headers) (request :body))]
+    status))

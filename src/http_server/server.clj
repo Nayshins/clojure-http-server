@@ -6,6 +6,7 @@
            [java.util.concurrent.CountDownLatch])
   (:require [clojure.java.io :as io]
             [http-server.request-parser :as request-parser]
+            [http_server.response-builder :as response-builder]
             [http-server.router :as router]
             [clojure.tools.logging :as log]))
 
@@ -53,7 +54,7 @@
         request-line (first request)
         headers (request-parser/convert-headers-to-hashmap (rest request))
         content-length (request-parser/get-content-length headers)
-        request {:request-line request-line  :headers headers}]
+        request {:request-line request-line :headers headers}]
     (log/info request-line)
     (if (> content-length 0)
       (assoc request :body (read-body in content-length))
@@ -64,15 +65,18 @@
     (.write out response 0 (count response))
   (.flush out)))
 
-(defn socket-handler [^Socket socket directory]
-    (let [in (socket-reader socket)
-          out (socket-writer socket)
-          rri (read-request in)
-          parsed-request (request-parser/parse-request-line (rri :request-line))]
-      (let [response (router/router 
-                       directory parsed-request 
-                       (rri :headers)(rri :body))]
-        (write-response out response))))
+(defn request-handler [^Socket socket directory]
+  (let [in (socket-reader socket)
+        out (socket-writer socket)
+        rri (read-request in)
+        parsed-request (request-parser/parse-request-line 
+                         (rri :request-line))
+        response-map (router/route directory 
+                                   {:parsed-request parsed-request
+                                    :headers (rri :headers)
+                                    :body (rri :body)} {})
+        http-response (response-builder/build-response response-map)]
+    (write-response out http-response)))
 
 (defn server [^ServerSocket server-socket directory]
   (loop []
@@ -81,7 +85,7 @@
         (with-open [socket ^Socket connection]
           (swap! connection-count inc)
           (.countDown ^java.util.concurrent.CountDownLatch socket-latch)
-          (socket-handler connection directory))))
+          (request-handler connection directory))))
     (if (.isClosed server-socket)
       (reset! connection-count 0N)
       (recur))))

@@ -16,5 +16,4 @@
   :profiles {:dev {:dependencies [[speclj "3.1.0"]]}}
   :plugins [[speclj "3.1.0"]]
   :test-paths ["spec"]
-  :warn-on-reflection true
   :main http-server.startup)
