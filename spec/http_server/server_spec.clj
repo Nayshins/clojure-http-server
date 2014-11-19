@@ -29,7 +29,7 @@
 (describe "server"
   (it "accepts a connection"
     (with-open [ss (create-server-socket 5000)]
-      (future (server ss "./public"))
+      (future (serve ss "./public"))
       (.await server-latch)
       (connect)
       (.await socket-latch)
@@ -59,7 +59,7 @@
 (describe "socket handler"
   (it "returns 200 OK on GET /index.html request"
       (with-open [ss (create-server-socket 4000)]
-        (future (server ss 
+        (future (serve ss 
                   "./public"))
         (.await server-latch)
         (should= "HTTP/1.1 200 OK" (test-input-output 

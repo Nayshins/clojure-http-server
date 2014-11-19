@@ -78,7 +78,7 @@
         http-response (response-builder/build-response response-map)]
     (write-response out http-response)))
 
-(defn server [^ServerSocket server-socket directory]
+(defn serve [^ServerSocket server-socket directory]
   (loop []
     (let [connection (accept-connection server-socket)]
       (future
