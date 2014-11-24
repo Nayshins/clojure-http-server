@@ -5,7 +5,7 @@
            [java.lang Integer]
            [java.util.concurrent.CountDownLatch])
   (:require [clojure.java.io :as io]
-            [http-server.request-parser :as request-parser]
+            [http-server.request-processor :as request-processor]
             [http_server.response-builder :as response-builder]
             [http-server.router :as router]
             [clojure.tools.logging :as log]))
@@ -23,7 +23,7 @@
     (.accept server)
     (catch SocketException e)))
 
-(defn create-server-socket [port]
+(defn create [port]
   (let [ss (ServerSocket. port)]
     (.countDown ^java.util.concurrent.CountDownLatch server-latch)
     ss))
@@ -52,9 +52,10 @@
 (defn read-request [in]
   (let [request (read-headers in) 
         request-line (first request)
-        headers (request-parser/convert-headers-to-hashmap (rest request))
-        content-length (request-parser/get-content-length headers)
+        headers (request-processor/convert-headers-to-hashmap (rest request))
+        content-length (request-processor/get-content-length headers)
         request {:request-line request-line :headers headers}]
+    (prn request)
     (log/info request-line)
     (if (> content-length 0)
       (assoc request :body (read-body in content-length))
@@ -65,27 +66,23 @@
     (.write out response 0 (count response))
   (.flush out)))
 
-(defn request-handler [^Socket socket directory]
+(defn request-handler [^Socket socket handler handlers]
   (let [in (socket-reader socket)
         out (socket-writer socket)
         rri (read-request in)
-        parsed-request (request-parser/parse-request-line 
-                         (rri :request-line))
-        response-map (router/route directory 
-                                   {:parsed-request parsed-request
-                                    :headers (rri :headers)
-                                    :body (rri :body)} {})
+        request-map (request-processor/process rri)
+        response-map (handler handlers request-map)
         http-response (response-builder/build-response response-map)]
     (write-response out http-response)))
 
-(defn serve [^ServerSocket server-socket directory]
+(defn serve [^ServerSocket server-socket handler handlers]
   (loop []
     (let [connection (accept-connection server-socket)]
       (future
         (with-open [socket ^Socket connection]
           (swap! connection-count inc)
           (.countDown ^java.util.concurrent.CountDownLatch socket-latch)
-          (request-handler connection directory))))
+          (request-handler connection handler handlers))))
     (if (.isClosed server-socket)
       (reset! connection-count 0N)
       (recur))))

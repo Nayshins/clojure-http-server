@@ -1,10 +1,21 @@
 (ns http-server.server-spec
   (:require [speclj.core :refer :all]
             [http-server.server :refer :all]
+            [http_server.handlers :as handlers-helper]
             [clojure.java.io :refer [reader writer]])
   (:import [java.net Socket]
            [java.io BufferedReader InputStreamReader StringReader]))
 
+
+(def routes '(["GET" "/" {:status 200}]))
+
+(defn app-router [request]
+  (some #(handlers-helper/check-route request %) routes))
+
+(defn four-oh-four [request]
+  {:status 404})
+
+(def handlers [four-oh-four app-router])
 
 (defn connect []
    (with-open [socket (Socket. "localhost"  5000)]))
@@ -23,13 +34,13 @@
 
 (describe "create-server"
   (it "creates a ServerSocket"
-    (with-open [server-socket (create-server-socket 5000)]
+    (with-open [server-socket (create 5000)]
       (should-be-a java.net.ServerSocket server-socket))))
 
 (describe "server"
   (it "accepts a connection"
-    (with-open [ss (create-server-socket 5000)]
-      (future (serve ss "./public"))
+    (with-open [ss (create 5000)]
+      (future (serve ss handlers-helper/try-handlers handlers))
       (.await server-latch)
       (connect)
       (.await socket-latch)
@@ -57,11 +68,11 @@
       (should= "body" ((read-request reader) :body)))))
 
 (describe "socket handler"
-  (it "returns 200 OK on GET /index.html request"
-      (with-open [ss (create-server-socket 4000)]
-        (future (serve ss 
-                  "./public"))
-        (.await server-latch)
-        (should= "HTTP/1.1 200 OK" (test-input-output 
-                                     "GET /index.html HTTP/1.1\r\nContent-Length: 0\r\n\r\n")))))
+  (it "returns 200 OK on GET / request"
+    (with-open [ss (create 4000)]
+      (future (serve ss handlers-helper/try-handlers handlers))
+      (.await server-latch)
+      (should= "HTTP/1.1 200 OK" 
+               (test-input-output 
+                 "GET / HTTP/1.1\r\nContent-Length: 0\r\n\r\n")))))
 

@@ -55,8 +55,7 @@
         body (get-trimmed-body body-bytes begin end)]
     {:status 206 
      :headers {"Content-Type" (mime-type-of (io/file path))
-               "Content-Length"
-               (count body)}
+               "Content-Length" (count body)}
      :body body}))
 
 (defn get-file-data [directory location headers]
@@ -128,12 +127,6 @@
 (defn head-route [location directory]
   {:status 200})
 
-(defn functional-router [directory parsed-request
-                         headers custom-routes & body]
-  (let [route-key (str (parsed-request :action) " " (parsed-request :location))]
-   (if (contains? custom-routes route-key)
-     (eval (custom-routes route-key)))))
-
 (defmulti router (fn [directory parsed-request headers & body]
                    (parsed-request :action)))
 
@@ -174,8 +167,3 @@
 
 (defmethod router :default [directory parsed-request headers & body]
   {:status 400})
-
-(defn route [directory request custom-routes]
-  (let [status (router directory (request :parsed-request) 
-          (request :headers) (request :body))]
-    status))
