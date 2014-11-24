@@ -20,7 +20,7 @@
 (defn not-found [request]
   {:status 404})
 
-(def handlers [not-found resource-router app-router])
+(def handlers [app-router resource-router not-found])
 
 (defn connect []
    (with-open [socket (Socket. "localhost"  5000)]))

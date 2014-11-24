@@ -20,13 +20,9 @@
   (some #(check-route request %) routes))
 
 (defn file-router [request]
-  (prn "calling file router")
   (resource-router/router request))
 
-(defn four-oh-four [request]
-  {:status 404})
-
-(def route-handlers [four-oh-four app-router])
+(def route-handlers [app-router not-found])
 
 (def request {:action "GET" :location "/"})
 (def bad-request {:action "GET" :location "foo"})

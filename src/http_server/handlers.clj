@@ -10,7 +10,7 @@
     fun)))
 
 (defn try-handlers [handlers request]
-  (let [fun (peek handlers)]
+  (let [fun (first handlers)]
     (if-let [response (fun request)]
       response
-      (recur (pop handlers) request))))
+      (recur (rest handlers) request))))
