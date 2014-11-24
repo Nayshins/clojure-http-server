@@ -90,80 +90,78 @@
      :headers {:Content-Length (count decoded-params)} 
      :body decoded-params}))
 
-(defn contain-route? [config-option location]
-  (some (partial = location) config-option))
-
-(defn get-route [location directory headers] 
-  (let [query (clojure.string/split location #"\?") 
+(defn get-route [request directory] 
+  (let [query (clojure.string/split (request :location) #"\?") 
         location (first query)
         params (second query)]
-    (get-file-data directory location headers)))
+    (get-file-data directory location (request :headers))))
 
 (defn options-route [location directory]
 {:status 200 :headers {"Allow" "GET,HEAD,POST,OPTIONS,PUT"}})
 
-(defn patch-route [body location directory headers]
-    (let [path (str directory location)
+(defn patch-route [request directory]
+    (let [path (str directory (request :location))
+          headers (request :headers)
           file-data (slurp path)
           encoded-file-data (pandect/sha1 file-data)
           etag (headers :If-Match)]
-      (fileio/overwrite-file path body)
+      (fileio/overwrite-file path (request :body))
       {:status 204}))
 
-(defn post-route [body location directory]
-  (do 
+(defn post-route [request directory]
+  (let [location (request :location)
+        body (first (request :body))]
     (fileio/append-to-file (str directory location) body)
     {:status 200}))
 
-(defn put-route [body location directory]
-  (do 
+(defn put-route [request directory]
+  (let [location (request :location)
+        body (first (request :body))] 
     (spit (str directory location) body)
     {:status 200}))
 
-(defn delete-route [location directory]
-  (spit (str directory location) "")
+(defn delete-route [request directory]
+  (spit (str directory (request :location)) "")
   {:status 200})
 
 (defn head-route [location directory]
   {:status 200})
 
-(defmulti router (fn [directory parsed-request headers & body]
-                   (parsed-request :action)))
+(defmulti router (fn [request directory]
+                   (request :action)))
 
-(defmethod router "GET" [directory parsed-request headers & body]
-  (let [action (parsed-request :action)
-        location (parsed-request :location)]
-    (get-route location directory headers)))
+(defmethod router "GET" [request directory]
+  (get-route request directory))
 
-(defmethod router "OPTIONS" [directory parsed-request headers & body]
-  (let [action (parsed-request :action)
-        location (parsed-request :location)]
+(defmethod router "OPTIONS" [request directory]
+  (let [action (request :action)
+        location (request :location)]
     (options-route location directory)))
 
-(defmethod router "POST" [directory parsed-request headers & body]
-  (let [action (parsed-request :action)
-        location (parsed-request :location)]
-    (post-route (first body) location directory)))
+(defmethod router "POST" [request directory]
+  (let [action (request :action)
+        location (request :location)]
+    (post-route request directory)))
 
-(defmethod router "PATCH" [directory parsed-request headers & body]
-  (let [action (parsed-request :action)
-        location (parsed-request :location)]
-    (patch-route (first body) location directory headers)))
+(defmethod router "PATCH" [request directory]
+  (let [action (request :action)
+        location (request :location)]
+    (patch-route request directory)))
 
-(defmethod router "PUT" [directory parsed-request headers & body]
-  (let [action (parsed-request :action)
-        location (parsed-request :location)]
-    (put-route (first body) location directory)))
+(defmethod router "PUT" [request directory]
+  (let [action (request :action)
+        location (request :location)]
+    (put-route request directory)))
 
-(defmethod router "DELETE" [directory parsed-request headers & body]
-  (let [action (parsed-request :action)
-        location (parsed-request :location)]
-    (delete-route location directory)))
+(defmethod router "DELETE" [request directory]
+  (let [action (request :action)
+        location (request :location)]
+    (delete-route request directory)))
 
-(defmethod router "HEAD" [directory parsed-request headers & body]
-  (let [action (parsed-request :action)
-        location (parsed-request :location)]
-    (head-route location directory)))
+(defmethod router "HEAD" [request directory]
+  (let [action (request :action)
+        location (request :location)]
+    (head-route request directory)))
 
-(defmethod router :default [directory parsed-request headers & body]
-  {:status 400})
+(defmethod router :default [request directory]
+  nil)

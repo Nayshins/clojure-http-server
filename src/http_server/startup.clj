@@ -13,12 +13,9 @@
   (some #(handlers-helper/check-route request %) routes))
 
 (defn file-router [request]
-  (resource-router/router request))
+  (resource-router/router request directory))
 
-(defn four-oh-four [request]
-  {:status 404})
-
-(def handlers [four-oh-four file-router app-router])
+(def handlers [handlers-helper/not-found file-router app-router])
 
 (defn -main [& args]
   (let [cli-options (parse args)]

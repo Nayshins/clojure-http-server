@@ -1,5 +1,8 @@
 (ns http_server.handlers)
 
+(defn not-found [request]
+  {:status 404})
+
 (defn check-route [request route]
   (let [[method path fun] route]
   (if (and (= method (request :action))

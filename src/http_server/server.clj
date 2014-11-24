@@ -55,7 +55,6 @@
         headers (request-processor/convert-headers-to-hashmap (rest request))
         content-length (request-processor/get-content-length headers)
         request {:request-line request-line :headers headers}]
-    (prn request)
     (log/info request-line)
     (if (> content-length 0)
       (assoc request :body (read-body in content-length))

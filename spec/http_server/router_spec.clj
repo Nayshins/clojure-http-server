@@ -3,7 +3,7 @@
             [speclj.core :refer :all])
   (:import [java.io File]))
 
-(def path (str (-> (java.io.File. "") .getAbsolutePath) "/public"))
+(def path "./public")
 
 (def test-path 
   "/tmp/test")
@@ -21,45 +21,42 @@
 
   (it "returns file contnets from a GET /file request"
     (should= 
-      200
-             (:status (router "/" {:action "GET" :location "tmp/test"} {}))))
+      200 ((router {:action "GET" :location "tmp/test" :headers {}} "/") :status)))
 
   (it "returns 404 when trying to read nonexistent file"
     (should= {:status 404} 
-             (router path {:action "GET" :location "/foobar"} {})))
+             (router {:action "GET" :location "/foobar"} "/")))
 
 
   (it "returns allow header with GET POST OPTIONS PUT HEAD from options"
     (should=
       {:status 200 :headers {"Allow" "GET,HEAD,POST,OPTIONS,PUT"}}
-      (router path  {:action "OPTIONS" :location "/"} {} "test")))
+      (router {:action "OPTIONS" :location "/"} path)))
 
   (it "returns 204 no content on PATCH"
     (should= {:status 204}
-             (router "/" {:action "PATCH" :location "tmp/test"} {})))
+             (router 
+               {:action "PATCH" :location "tmp/test" 
+                :headers {:If-Match "0"} :body '("test")} "/")))
 
   (it "appends body of the request to the requested file POST"
     (write-to-test "test")
     (should= ok 
-             (router "/" {:action "POST" :location "/tmp/test"} {} "test"))
+             (router {:action "POST" :location "tmp/test" :headers {} :body '("test")} "/"))
     (should= "testtest" (slurp "/tmp/test")))
 
   (it "PUT overwrites current file content"
     (write-to-test "FAIL")
     (should= ok 
-             (router "/" {:action "PUT" :location "/tmp/test"} {} "PUT test"))
+             (router {:action "PUT" :location "tmp/test" :body '("PUT test")} "/"))
     (should= "PUT test" (slurp "/tmp/test")))
 
   (it "deletes file contents with DELETE"
     (write-to-test "FAIL")
     (should= ok 
-             (router "/" {:action "DELETE" :location "/tmp/test"} {}))
+             (router {:action "DELETE" :location "/tmp/test" :headers {}} ""))
     (should= "" (slurp "/tmp/test")))
 
   (it "returns 200 ok for HEAD request"
-    (should= ok (router path {:action "HEAD" :location "/"} {})))
-
-  (it "returns 400 for bad request"
-    (should= {:status 400}
-                    (router path {:action "BAD" :location "/"} {}))))
+    (should= ok (router {:action "HEAD" :location "/" :headers {}} "/"))))
 

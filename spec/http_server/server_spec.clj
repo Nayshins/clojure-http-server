@@ -9,13 +9,18 @@
 
 (def routes '(["GET" "/" {:status 200}]))
 
+(def directory "./public")
+
 (defn app-router [request]
   (some #(handlers-helper/check-route request %) routes))
 
-(defn four-oh-four [request]
+(defn resource-router [request]
+  (http-server.router/router request directory))
+
+(defn not-found [request]
   {:status 404})
 
-(def handlers [four-oh-four app-router])
+(def handlers [not-found resource-router app-router])
 
 (defn connect []
    (with-open [socket (Socket. "localhost"  5000)]))
@@ -25,7 +30,7 @@
     (connect)))
 
 (defn test-input-output [request]
-  (with-open [socket (Socket. "localhost" 4000)
+  (with-open [socket (Socket. "localhost" 5000)
               out (writer socket)
               in (reader socket)]
     (.write out request)
@@ -67,12 +72,26 @@
                            "GET / HTTP/1.1\r\nContent-Length: 4\r\n\r\nbody\r\n\r\n")))))]
       (should= "body" ((read-request reader) :body)))))
 
-(describe "socket handler"
+(describe "request handler"
   (it "returns 200 OK on GET / request"
-    (with-open [ss (create 4000)]
+    (with-open [ss (create 5000)]
       (future (serve ss handlers-helper/try-handlers handlers))
       (.await server-latch)
       (should= "HTTP/1.1 200 OK" 
                (test-input-output 
-                 "GET / HTTP/1.1\r\nContent-Length: 0\r\n\r\n")))))
+                 "GET / HTTP/1.1\r\nContent-Length: 0\r\n\r\n"))))
+  
+  (it "returns 200 for file found with resource router" 
+    (with-open [ss (create 5000)]
+      (future (serve ss handlers-helper/try-handlers handlers))
+      (.await server-latch)
+      (should= "HTTP/1.1 200 OK" 
+               (test-input-output 
+                 "GET /index.html HTTP/1.1\r\nContent-Length: 0\r\n\r\n"))))
 
+  (it "returns a 404 if route not found"
+    (with-open [ss (create 5000)]
+      (future (serve ss handlers-helper/try-handlers handlers))
+      (.await server-latch)
+      (should= "HTTP/1.1 404 NOT FOUND"
+               (test-input-output "GET /foo HTTP/1.1\r\nContent-Length: 0\r\n\r\n")))))
