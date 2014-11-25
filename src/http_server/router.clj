@@ -73,12 +73,6 @@
          (.getBytes)
          (byte-array))))
 
-(defn handle-query [params]
-  (let [decoded-params (decode-params params)]
-    {:status 200 
-     :headers {:Content-Length (count decoded-params)} 
-     :body decoded-params}))
-
 (defn get-route [request directory] 
   (let [query (clojure.string/split (request :location) #"\?") 
         location (first query)
