@@ -87,7 +87,7 @@
       (.await server-latch)
       (should= "HTTP/1.1 200 OK" 
                (test-input-output 
-                 "GET /file1 HTTP/1.1\r\nContent-Length: 0\r\n\r\n"))))
+                 "GET /logs HTTP/1.1\r\nContent-Length: 0\r\n\r\n"))))
 
   (it "returns a 404 if route not found"
     (with-open [ss (create 5000)]
