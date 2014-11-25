@@ -6,7 +6,8 @@
 
 (def directory "./public")
 
-(def handlers [app-router parameters-router resource-router not-found])
+(def handlers [])
+
 (defn -main [& args]
   (let [cli-options (parse args)]
     (prn "starting server")

@@ -1,4 +1,4 @@
-(defproject http-server "0.1.0-SNAPSHOT"
+(defproject http-server "0.2.0"
   :description "A simple http server written in clojure"
   :url "www.jakenations.me"
   :license {:name "Eclipse Public License"
