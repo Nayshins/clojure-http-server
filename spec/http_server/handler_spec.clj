@@ -12,9 +12,18 @@
     request
     nil))
 
+(def simple-fun
+  {:status 200})
+
+(defn detailed-fun [request]
+  (if (= "GET" (request :action))
+    {:status 200}))
+
 (def simple-handlers [equals-one equals-two])
 
-(def routes '(["GET" "/" {:status 200}]))
+(def routes [["GET" "/" {:status 200}]
+             ["GET" "/foobar" simple-fun]
+             ["GET" "/function" detailed-fun]])
 
 (defn app-router [request]
   (some #(check-route request %) routes))
@@ -25,6 +34,11 @@
 (def route-handlers [app-router not-found])
 
 (def request {:action "GET" :location "/"})
+
+(def function-request {:action "GET" :location "/foobar"})
+
+(def detailed-function-request {:action "GET" :location "/function"})
+
 (def bad-request {:action "GET" :location "foo"})
 
 (describe "check-route"
@@ -43,7 +57,15 @@
   (it "returns response when route and path match"
     (should= {:status 200}
              (try-handlers route-handlers request)))
-  
+ 
+ (it "evaluates the function of the route"
+   (should= {:status 200}
+            (try-handlers route-handlers function-request)))
+
+ (it "evaluates the function of a route if it requires the request"
+   (should= {:status 200}
+            (try-handlers route-handlers detailed-function-request)))
+
   (it "moves to next handler if no match is found in the first"
     (should= {:status 404}
              (try-handlers route-handlers bad-request))))

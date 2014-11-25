@@ -23,14 +23,11 @@
          (.getBytes ^String __)
          (byte-array __))))
 
-(defn build-body [body]
-  (if-not (nil? (first body))
-  (first body)))
 
 (defn build-response [status-map]
   (let [response-byte-arrays
         [(build-code (status-map :status))
          (build-headers (status-map :headers)) 
          (.getBytes "\r\n") 
-         (build-body (status-map :body))]]
-    (byte-array (mapcat seq response-byte-arrays))))
+         (status-map :body)]]
+    (byte-array (mapcat seq response-byte-arrays)))) 

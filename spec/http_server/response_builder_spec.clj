@@ -11,15 +11,9 @@
     (should= "header-key: header-value\r\n" 
              (String. (build-headers {"header-key" "header-value"})))))
 
-(describe "build body"
-  (it "returns nothing if body is empty"
-    (should= nil (build-body '())))
-  
-  (it "returns body as a byte array"
-    (should= "body" (String. (build-body '("body"))))))
-
 (describe "build-response"
   (it "builds the full response"
-    (should= "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n"
+    (should= "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\nHelloWorld"
              (String. (build-response {:status 200
-                                       :headers {"Content-Length" "0"}})))))
+                                       :headers {"Content-Length" "0"}
+                                       :body (byte-array (.getBytes "HelloWorld"))})))))

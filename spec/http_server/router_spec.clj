@@ -42,13 +42,13 @@
   (it "appends body of the request to the requested file POST"
     (write-to-test "test")
     (should= ok 
-             (router {:action "POST" :location "tmp/test" :headers {} :body '("test")} "/"))
+             (router {:action "POST" :location "tmp/test" :headers {} :body "test"} "/"))
     (should= "testtest" (slurp "/tmp/test")))
 
   (it "PUT overwrites current file content"
     (write-to-test "FAIL")
     (should= ok 
-             (router {:action "PUT" :location "tmp/test" :body '("PUT test")} "/"))
+             (router {:action "PUT" :location "tmp/test" :body "PUT test"} "/"))
     (should= "PUT test" (slurp "/tmp/test")))
 
   (it "deletes file contents with DELETE"

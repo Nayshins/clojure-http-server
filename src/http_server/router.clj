@@ -28,14 +28,9 @@
 (defn build-directory [directory]
   (let [directory-links (to-byte-array 
                           (build-directory-links directory))]
-    (response-builder/build-response 200 
-                    {"Content-Length" (count directory-links)} 
-                    directory-links)))
-
-;(defn check-auth [auth]
-  ;(if auth
-    ;(= (config-opti) (base64/decode (second auth))) 
-    ;false))
+    {:status 200 
+      :headers {"Content-Length" (count directory-links)} 
+      :body directory-links}))
 
 (defn get-trimmed-body [body-bytes begin end]
   (->> body-bytes
@@ -104,13 +99,13 @@
 
 (defn post-route [request directory]
   (let [location (request :location)
-        body (first (request :body))]
+        body (request :body)]
     (fileio/append-to-file (str directory location) body)
     {:status 200}))
 
 (defn put-route [request directory]
   (let [location (request :location)
-        body (first (request :body))] 
+        body (request :body)] 
     (spit (str directory location) body)
     {:status 200}))
 
