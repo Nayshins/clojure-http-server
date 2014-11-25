@@ -71,12 +71,6 @@
     (catch Exception e
       {:status 404})))
 
-(defn authenticate [directory location headers]
-  (let [no-auth (.getBytes "Authentication required")]
-    (if (headers :Authorization) 
-      (get-file-data directory location headers) 
-      (response-builder/build-response 401 {} no-auth))))
-
 (defn decode-params [params]
   (let [params (clojure.string/replace params #"=" " = ")]
     (->> params
