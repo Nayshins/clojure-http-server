@@ -33,8 +33,8 @@
 
 (defn socket-writer [socket]
   (let [writer (DataOutputStream.
-                        (BufferedOutputStream.
-                          (.getOutputStream ^Socket socket)))]
+                 (BufferedOutputStream.
+                   (.getOutputStream ^Socket socket)))]
     writer))
 
 (defn read-headers [in]
