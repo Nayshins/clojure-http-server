@@ -1,7 +1,8 @@
 # Simple Http Server Written in Clojure
 [![Build Status](https://travis-ci.org/Nayshins/clojure-http-server.svg?branch=master)](https://travis-ci.org/Nayshins/clojure-http-server)
 
-A simple and extensible http server written in clojure. This server takes connections over TCP, and serves a public folder.
+A simple and extensible http server written in clojure. This server takes connections over TCP, and follows a middleware pattern similar to ring and compojure.
+
 ## Requirments 
 Leiningen 2.5 is required in order to run the server. Installation instructions can be found [here](http://leiningen.org/)
 
@@ -13,19 +14,27 @@ Leiningen 2.5 is required in order to run the server. Installation instructions 
 $ lein deps 
 ```
 ## Configure Server
-The server can handle special routes by editing the config file. The accepted headings are :authenticate and :credentials, :accept-parameters, :protected, :redirect, :directory. 
+The server follows a middleware pattern similar to Ring and Compojure. The
+server returns a hashmap of the response with the following keys: 
+- :location String of the location of the request
+- :method - The method of the http request
+- :headers - Hashmap of headers from the request.
+- :body - String of the request body.
 
-The format of the file is heading: /file
+The server expects a hashmap to contain a :status header containing an integer
+of the response code. This is the only required key in the hashmap. The response
+also accepts the :headers and :body keys. The headers key should be a hashmap of
+the headers for the response, and the body key should be a string or byte-array
+of the response body.
 
-An example config file to have the root path return a directory and the logs be protected by basic auth would look like:
+The server provides access to the resource-handler middleware which will serve
+files off of the directory set at runtime. To use the resource router, require
+http-server.resource-handler in the startup namespace and reference the router
+function. Then enter then enter the function into the handlers vector.
 
-```
-directory: /
-
-authenticate: /logs
-credentials: admin:password
-```
-
+You can provide any handler into the handlers vector, and it will work properly
+as long as the handler returns a hashmap or nil. To return a 404, place the
+handlers/not-found into the last position of the handlers vector.
 ## Running the Server
 Once you have your server configured to your needs, you can start the server. The command line takes 2 arguments with the run server command.
 ```
