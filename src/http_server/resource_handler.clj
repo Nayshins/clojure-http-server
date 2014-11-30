@@ -1,4 +1,4 @@
-(ns http-server.router
+(ns http-server.resource-handler
   (:require [http_server.response-builder :as response-builder]
             [http_server.fileio :as fileio]
             [clojure.java.io :as io]

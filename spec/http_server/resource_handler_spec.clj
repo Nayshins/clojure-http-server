@@ -1,5 +1,5 @@
-(ns http-server.router-spec
-  (:require [http-server.router :refer :all]
+(ns http-server.resource-handler-spec
+  (:require [http-server.resource-handler :refer :all]
             [speclj.core :refer :all])
   (:import [java.io File]))
 
