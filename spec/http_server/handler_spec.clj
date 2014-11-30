@@ -1,7 +1,7 @@
 (ns http-server.handler-spec
   (:require [speclj.core :refer :all]
             [http_server.handlers :refer :all]
-            [http-server.router :as resource-router]))
+            [http-server.resource-handler :as resource-router]))
 
 (defn equals-one [request]
   (if (= 1 request)
