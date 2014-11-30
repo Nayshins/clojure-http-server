@@ -6,15 +6,11 @@
 (defmulti evaluate-route (fn [fun request]
                            (class fun)))
 
-(defmethod evaluate-route clojure.lang.PersistentHashMap [fun request]
+(defmethod evaluate-route clojure.lang.APersistentMap [fun request]
   fun)
 
-(defmethod evaluate-route clojure.lang.PersistentArrayMap [fun request]
-  fun)
-
-(defmethod evaluate-route :default [fun request]
+(defmethod evaluate-route clojure.lang.IFn [fun request]
   (fun request))
-
 
 (defn check-route [request route]
   (let [[method path fun] route]
