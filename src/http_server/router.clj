@@ -117,34 +117,22 @@
   (get-route request directory))
 
 (defmethod router "OPTIONS" [request directory]
-  (let [action (request :action)
-        location (request :location)]
-    (options-route location directory)))
+    (options-route request directory))
 
 (defmethod router "POST" [request directory]
-  (let [action (request :action)
-        location (request :location)]
-    (post-route request directory)))
+    (post-route request directory))
 
 (defmethod router "PATCH" [request directory]
-  (let [action (request :action)
-        location (request :location)]
-    (patch-route request directory)))
+    (patch-route request directory))
 
 (defmethod router "PUT" [request directory]
-  (let [action (request :action)
-        location (request :location)]
-    (put-route request directory)))
+    (put-route request directory))
 
 (defmethod router "DELETE" [request directory]
-  (let [action (request :action)
-        location (request :location)]
-    (delete-route request directory)))
+    (delete-route request directory))
 
 (defmethod router "HEAD" [request directory]
-  (let [action (request :action)
-        location (request :location)]
-    (head-route request directory)))
+    (head-route request directory))
 
 (defmethod router :default [request directory]
   nil)
