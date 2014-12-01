@@ -22,4 +22,3 @@
   (let [parsed-request-line (parse-request-line (request :request-line))
         request-map (dissoc request :request-line)]
         (merge request-map parsed-request-line)))
-

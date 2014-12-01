@@ -42,7 +42,6 @@
     (partial not= "")
     (line-seq in)))
 
-
 (defn read-body [^BufferedReader in content-length]
   (let [body (char-array content-length)]
     (.read in body 0 content-length)
