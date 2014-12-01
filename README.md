@@ -32,9 +32,17 @@ files off of the directory set at runtime. To use the resource router, require
 http-server.resource-handler in the startup namespace and reference the router
 function. Then enter then enter the function into the handlers vector.
 
-You can provide any handler into the handlers vector, and it will work properly
-as long as the handler returns a hashmap or nil. To return a 404, place the
-handlers/not-found into the last position of the handlers vector.
+Custom routes can be created by adding a route vector that looks like this 
+```clojure
+["GET" "/" {:status 200}] 
+```
+to the vector of vectors called routes. To use this routes vector you will need
+to create a handler that will check each route to see if returns the body or
+nil. The serve provides a handlers/check-route function that will check to see
+if the method and path match, and if they match return the body. 
+
+You can provide any handler into the handlers vector, as long as the handler returns a hashmap or nil.
+To return a 404, place the handlers/not-found into the last position of the handlers vector.
 ## Running the Server
 Once you have your server configured to your needs, you can start the server. The command line takes 2 arguments with the run server command.
 ```

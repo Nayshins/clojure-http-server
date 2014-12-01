@@ -62,7 +62,7 @@
 (defn write-response [^DataOutputStream out response]
   (with-open [out out] 
     (.write out response 0 (count response))
-  (.flush out)))
+    (.flush out)))
 
 (defn request-handler [^Socket socket handler handlers]
   (let [in (socket-reader socket)
