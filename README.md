@@ -3,7 +3,7 @@
 
 A simple and extensible http server written in clojure. This server takes connections over TCP, and follows a middleware pattern similar to ring and compojure.
 
-## Requirments 
+## Requirements 
 Leiningen 2.5 is required in order to run the server. Installation instructions can be found [here](http://leiningen.org/)
 
 ## Initial Setup
