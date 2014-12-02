@@ -80,7 +80,7 @@
     (get-file-data directory location (request :headers))))
 
 (defn options-route [location directory]
-{:status 200 :headers {"Allow" "GET,HEAD,POST,OPTIONS,PUT"}})
+  {:status 200 :headers {"Allow" "GET,HEAD,POST,OPTIONS,PUT"}})
 
 (defn patch-route [request directory]
     (let [path (str directory (request :location))

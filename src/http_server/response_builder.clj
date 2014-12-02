@@ -1,4 +1,4 @@
-(ns http_server.response-builder
+(ns http-server.response-builder
   (:require [clojure.java.io :as io]))
 
 (def response-code { 200 " OK\r\n"

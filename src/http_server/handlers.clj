@@ -1,4 +1,4 @@
-(ns http_server.handlers)
+(ns http-server.handlers)
 
 (defn not-found [request]
   {:status 404})

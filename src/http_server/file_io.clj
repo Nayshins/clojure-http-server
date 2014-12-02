@@ -1,4 +1,4 @@
-(ns http_server.fileio
+(ns http-server.file-io
   (:require [clojure.java.io :as io]))
 
 (defn binary-slurp [path]
