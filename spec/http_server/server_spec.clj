@@ -15,7 +15,7 @@
   (some #(handlers-helper/check-route request %) routes))
 
 (defn resource-router [request]
-  (http-server.resource-handler/router request directory))
+  (http-server.static-router/router request directory))
 
 (defn not-found [request]
   {:status 404})
