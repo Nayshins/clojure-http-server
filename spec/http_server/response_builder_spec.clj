@@ -1,5 +1,5 @@
 (ns http_server.response-builder-spec
-  (:require [http_server.response-builder :refer :all]
+  (:require [http-server.response-builder :refer :all]
             [speclj.core :refer :all]))
 
 (describe "Build Code"

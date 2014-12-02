@@ -1,6 +1,6 @@
 (ns http-server.resource-handler
-  (:require [http_server.response-builder :as response-builder]
-            [http_server.fileio :as fileio]
+  (:require [http-server.response-builder :as response-builder]
+            [http-server.file-io :as fileio]
             [clojure.java.io :as io]
             [base64-clj.core :as base64]
             [pantomime.mime :refer [mime-type-of]]

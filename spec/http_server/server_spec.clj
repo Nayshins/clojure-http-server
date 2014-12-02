@@ -1,7 +1,7 @@
 (ns http-server.server-spec
   (:require [speclj.core :refer :all]
             [http-server.server :refer :all]
-            [http_server.handlers :as handlers-helper]
+            [http-server.handlers :as handlers-helper]
             [clojure.java.io :refer [reader writer]])
   (:import [java.net Socket]
            [java.io BufferedReader InputStreamReader StringReader]))

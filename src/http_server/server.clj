@@ -6,7 +6,7 @@
            [java.util.concurrent.CountDownLatch])
   (:require [clojure.java.io :as io]
             [http-server.request-processor :as request-processor]
-            [http_server.response-builder :as response-builder]
+            [http-server.response-builder :as response-builder]
             [clojure.tools.logging :as log]))
 
 (set! *warn-on-reflection* true)

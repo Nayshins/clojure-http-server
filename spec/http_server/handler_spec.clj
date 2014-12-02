@@ -1,6 +1,6 @@
 (ns http-server.handler-spec
   (:require [speclj.core :refer :all]
-            [http_server.handlers :refer :all]
+            [http-server.handlers :refer :all]
             [http-server.resource-handler :as resource-router]))
 
 (defn equals-one [request]

@@ -1,5 +1,5 @@
-(ns http-server.fileio-spec
-  (:require [http_server.fileio :refer :all]
+(ns http-server.file-io-spec
+  (:require [http-server.file-io :refer :all]
             [speclj.core :refer :all]))
 
 (def test-path "/tmp/test")
