@@ -1,4 +1,4 @@
-(ns http_server.response-builder-spec
+(ns http-server.response-builder-spec
   (:require [http-server.response-builder :refer :all]
             [speclj.core :refer :all]))
 

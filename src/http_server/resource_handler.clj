@@ -3,8 +3,7 @@
             [http-server.file-io :as fileio]
             [clojure.java.io :as io]
             [base64-clj.core :as base64]
-            [pantomime.mime :refer [mime-type-of]]
-            [pandect.core :as pandect]))
+            [pantomime.mime :refer [mime-type-of]]))
 
 (defn to-byte-array [string]
   (->> ^String string
