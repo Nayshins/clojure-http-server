@@ -1,7 +1,6 @@
 (ns http-server.handler-spec
   (:require [speclj.core :refer :all]
-            [http-server.handlers :refer :all]
-            [http-server.static-router :as resource-router]))
+            [http-server.handlers :refer :all]))
 
 (defn equals-one [request]
   (if (= 1 request)
@@ -27,9 +26,6 @@
 
 (defn app-router [request]
   (some #(check-route request %) routes))
-
-(defn file-router [request]
-  (resource-router/router request))
 
 (def route-handlers [app-router not-found])
 

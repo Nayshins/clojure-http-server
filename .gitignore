@@ -12,3 +12,4 @@ m.xml
 .lein-repl-history
 .nrepl-port
 /public/logs
+pom.xml.asc

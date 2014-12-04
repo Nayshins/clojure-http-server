@@ -14,13 +14,10 @@
 (defn app-router [request]
   (some #(handlers-helper/check-route request %) routes))
 
-(defn resource-router [request]
-  (http-server.static-router/router request directory))
-
 (defn not-found [request]
   {:status 404})
 
-(def handlers [app-router resource-router not-found])
+(def handlers [app-router not-found])
 
 (defn connect []
    (with-open [socket (Socket. "localhost"  5000)]))
@@ -80,14 +77,6 @@
       (should= "HTTP/1.1 200 OK" 
                (test-input-output 
                  "GET / HTTP/1.1\r\nContent-Length: 0\r\n\r\n"))))
-  
-  (it "returns 200 for file found with resource router" 
-    (with-open [ss (create 5000)]
-      (future (serve ss handlers-helper/try-handlers handlers))
-      (.await server-latch)
-      (should= "HTTP/1.1 200 OK" 
-               (test-input-output 
-                 "GET /logs HTTP/1.1\r\nContent-Length: 0\r\n\r\n"))))
 
   (it "returns a 404 if route not found"
     (with-open [ss (create 5000)]
