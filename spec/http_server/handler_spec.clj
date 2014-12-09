@@ -22,7 +22,8 @@
 
 (def routes [["GET" "/" {:status 200}]
              ["GET" "/foobar" simple-fun]
-             ["GET" "/function" detailed-fun]])
+             ["GET" "/function" detailed-fun]
+             ["GET" #"\/\d" {:status 200}]])
 
 (defn app-router [request]
   (some #(check-route request %) routes))
@@ -42,6 +43,10 @@
     (should= {:status 200}
              (check-route request (first routes))))
   
+  (it "matches a regex route"
+    (should= {:status 200}
+             (check-route {:action "GET" :location "/1"} (last routes))))
+
   (it "returns nil if there is no match"
     (should-be-nil (check-route bad-request (first routes)))))
 
