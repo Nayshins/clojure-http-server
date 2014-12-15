@@ -42,7 +42,7 @@
 (describe "server"
   (it "accepts a connection"
     (with-open [ss (create 5000)]
-      (future (serve ss handlers-helper/try-handlers handlers))
+      (future (serve ss handlers))
       (.await server-latch)
       (connect)
       (.await socket-latch)
@@ -72,7 +72,7 @@
 (describe "request handler"
   (it "returns 200 OK on GET / request"
     (with-open [ss (create 5000)]
-      (future (serve ss handlers-helper/try-handlers handlers))
+      (future (serve ss handlers))
       (.await server-latch)
       (should= "HTTP/1.1 200 OK" 
                (test-input-output 
@@ -80,7 +80,7 @@
 
   (it "returns a 404 if route not found"
     (with-open [ss (create 5000)]
-      (future (serve ss handlers-helper/try-handlers handlers))
+      (future (serve ss handlers))
       (.await server-latch)
       (should= "HTTP/1.1 404 NOT FOUND"
                (test-input-output "GET /foo HTTP/1.1\r\nContent-Length: 0\r\n\r\n")))))

@@ -11,6 +11,4 @@
 (defn -main [& args]
   (let [cli-options (parse args)]
     (prn "starting server")
-    (server/serve 
-      (server/create (cli-options :port)) 
-      handlers-helper/try-handlers handlers)))
+    (server/serve (server/create (:port cli-options)) handlers)))
