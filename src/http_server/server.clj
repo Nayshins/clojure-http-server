@@ -7,7 +7,8 @@
   (:require [clojure.java.io :as io]
             [http-server.request-processor :as request-processor]
             [http-server.response-builder :as response-builder]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [http-server.handlers :as handlers]))
 
 (set! *warn-on-reflection* true)
 
@@ -47,7 +48,7 @@
         out (socket-writer socket)
         rri (request-processor/read-request in)
         request-map (request-processor/process rri)
-        response-map (http-server.handlers/try-handlers handlers request-map)
+        response-map (handlers/try-handlers handlers request-map)
         http-response (response-builder/build-response response-map)]
     (write-response out http-response)))
 
