@@ -48,27 +48,6 @@
       (.await socket-latch)
       (should (> @connection-count 0)))))
 
-(describe "request reader"
-  (it "reads all of the request headers"
-     (let [reader (BufferedReader.
-                    (InputStreamReader. 
-                      (clojure.java.io/input-stream
-                        (byte-array (.getBytes 
-                          "GET / HTTP/1.1\r\nheader: hello\r\nContent-Length: 4\r\n\r\nbody\r\n\r\n")))))
-           headers ((read-request reader) :headers)]
-     (should= {:header "hello", :Content-Length "4"}
-              headers)
-     (should-not-contain "body" headers)))
-
-  (it "reads the body of the request"
-    (let [reader (BufferedReader.
-                   (InputStreamReader.
-                     (clojure.java.io/input-stream 
-                       (byte-array
-                         (.getBytes
-                           "GET / HTTP/1.1\r\nContent-Length: 4\r\n\r\nbody\r\n\r\n")))))]
-      (should= "body" ((read-request reader) :body)))))
-
 (describe "request handler"
   (it "returns 200 OK on GET / request"
     (with-open [ss (create 5000)]

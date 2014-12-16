@@ -37,27 +37,6 @@
                    (.getOutputStream ^Socket socket)))]
     writer))
 
-(defn read-headers [in]
-  (take-while
-    (partial not= "")
-    (line-seq in)))
-
-(defn read-body [^BufferedReader in content-length]
-  (let [body (char-array content-length)]
-    (.read in body 0 content-length)
-    (apply str body)))
-
-(defn read-request [in]
-  (let [request (read-headers in) 
-        request-line (first request)
-        headers (request-processor/convert-headers-to-hashmap (rest request))
-        content-length (request-processor/get-content-length headers)
-        request {:request-line request-line :headers headers}]
-    (log/info request-line)
-    (if (> content-length 0)
-      (assoc request :body (read-body in content-length))
-      request)))
-
 (defn write-response [^DataOutputStream out response]
   (with-open [out out] 
     (.write out response 0 (count response))
@@ -66,7 +45,7 @@
 (defn request-handler [^Socket socket handlers]
   (let [in (socket-reader socket)
         out (socket-writer socket)
-        rri (read-request in)
+        rri (request-processor/read-request in)
         request-map (request-processor/process rri)
         response-map (http-server.handlers/try-handlers handlers request-map)
         http-response (response-builder/build-response response-map)]

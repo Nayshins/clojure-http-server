@@ -1,6 +1,7 @@
 (ns http-server.request-processor
- (:require [clojure.string :as string]
-           [clojure.tools.logging :as log]))
+  (:import[java.io BufferedReader])
+  (:require [clojure.string :as string]
+            [clojure.tools.logging :as log]))
 
 (defn parse-request-line [request]
   (let [request-line (zipmap [:action :location :http] 
@@ -22,3 +23,24 @@
   (let [parsed-request-line (parse-request-line (request :request-line))
         request-map (dissoc request :request-line)]
         (merge request-map parsed-request-line)))
+
+(defn read-headers [in]
+  (take-while
+    (partial not= "")
+    (line-seq in)))
+
+(defn read-body [^BufferedReader in content-length]
+  (let [body (char-array content-length)]
+    (.read in body 0 content-length)
+    (apply str body)))
+
+(defn read-request [in]
+  (let [request (read-headers in) 
+        request-line (first request)
+        headers (convert-headers-to-hashmap (rest request))
+        content-length (get-content-length headers)
+        request {:request-line request-line :headers headers}]
+    (log/info request-line)
+    (if (> content-length 0)
+      (assoc request :body (read-body in content-length))
+      request)))
