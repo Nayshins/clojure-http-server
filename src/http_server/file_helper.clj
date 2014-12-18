@@ -52,7 +52,6 @@
 
 (defn get-body-range [body-bytes range-header path]
   (let [byte-range (second (parse-byte-range range-header))] 
-    (prn byte-range)
     (if (= 2 (count byte-range))
       (get-partial-range body-bytes byte-range path)
       (get-full-body-range body-bytes byte-range path))))
