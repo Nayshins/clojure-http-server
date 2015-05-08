@@ -1,5 +1,0 @@
-[2014-11-30 15:58:27,540][INFO][http-server.server] GET / HTTP/1.1
-[2014-11-30 15:58:27,542][INFO][http-server.server] GET / HTTP/1.1
-[2014-11-30 15:58:27,548][INFO][http-server.server] GET / HTTP/1.1
-[2014-11-30 15:58:27,552][INFO][http-server.server] GET /logs HTTP/1.1
-[2014-11-30 15:58:27,562][INFO][http-server.server] GET /foo HTTP/1.1
