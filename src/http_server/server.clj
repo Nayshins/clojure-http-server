@@ -39,7 +39,7 @@
     writer))
 
 (defn write-response [^DataOutputStream out response]
-  (with-open [out out] 
+  (with-open [out out]
     (.write out response 0 (count response))
     (.flush out)))
 
